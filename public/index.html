@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globalna Evropska Banka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .animate-pulse-slow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #facc15 0%, #fde047 50%, #22c55e 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div id="app" class="min-h-screen">
+        <!-- Loading screen -->
+        <div id="loading" class="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div class="text-center text-white">
+                <div class="animate-spin w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold">Nalaganje...</h2>
+                <p>Globalna Evropska Banka</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration API
+        const API_URL = window.location.origin + '/api';
+        let currentUser = null;
+        let authToken = localStorage.getItem('authToken');
+
+        // État de l'application
+        let appState = {
+            currentScreen: 'home',
+            currentImageIndex: 0,
+            isLoggedIn: false,
+            isAdmin: false,
+            userAccount: null,
+            pendingAccounts: []
+        };
+
+        // Données statiques
+        const scrollingTexts = [
+            "Banka, ki revolucionira digitalne bančne storitve",
+            "100 % digitalna, 100 % varna banka",
+            "Vaša prihodnost bančništva je tukaj",
+            "Inovativne rešitve za moderne uporabnike"
+        ];
+
+        const bankImages = [
+            {
+                icon: "📱",
+                title: "Mobilno bančništvo",
+                desc: "Dostop do vseh storitev"
+            },
+            {
+                icon: "💶",
+                title: "Transferji",
+                desc: "Hitri in varni prenosi"
+            },
+            {
+                icon: "💳",
+                title: "Plačilne kartice",
+                desc: "Brezstične plačila"
+            },
+            {
+                icon: "🏦",
+                title: "Varne storitve",
+                desc: "Zaščita vašega denarja"
+            }
+        ];
+
+        // Fonctions utilitaires
+        function showScreen(screenName) {
+            appState.currentScreen = screenName;
+            renderCurrentScreen();
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `fixed top-4 right-4 p-4 rounded-lg z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            } text-white`;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(messageDiv);
+            }, 3000);
+        }
+
+        // API Calls
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const config = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (authToken) {
+                    config.headers['Authorization'] = `Bearer ${authToken}`;
+                }
+
+                if (data) {
+                    config.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`${API_URL}${endpoint}`, config);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Napaka pri komunikaciji s strežnikom');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Authentication
+        async function login(username, password) {
+            try {
+                const result = await apiCall('/login', 'POST', { username, password });
+                
+                if (result.success) {
+                    authToken = result.token;
+                    localStorage.setItem('authToken', authToken);
+                    currentUser = result.user;
+                    appState.isLoggedIn = true;
+                    appState.isAdmin = result.user.isAdmin;
+                    
+                    if (result.user.isAdmin) {
+                        showScreen('admin');
+                        loadAdminData();
+                    } else {
+                        appState.userAccount = result.user;
+                        showScreen('dashboard');
+                    }
+                    
+                    showMessage('Prijava uspešna!', 'success');
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function register(formData) {
+            try {
+                const result = await apiCall('/register', 'POST', formData);
+                
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    showScreen('waiting');
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function logout() {
+            localStorage.removeItem('authToken');
+            authToken = null;
+            currentUser = null;
+            appState.isLoggedIn = false;
+            appState.isAdmin = false;
+            appState.userAccount = null;
+            showScreen('home');
+        }
+
+        // Admin functions
+        async function loadAdminData() {
+            try {
+                const result = await apiCall('/admin/users');
+                if (result.success) {
+                    appState.pendingAccounts = result.users;
+                    renderCurrentScreen();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function approveUser(userId) {
+            try {
+                const result = await apiCall(`/admin/approve-user/${userId}`, 'POST');
+                if (result.success) {
+                    showMessage('Uporabnik odobren!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function blockUser(userId) {
+            try {
+                const result = await apiCall(`/admin/block-user/${userId}`, 'POST');
+                if (result.success) {
+                    showMessage('Uporabnik blokiran!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function updateBalance(userId, balance) {
+            try {
+                const result = await apiCall(`/admin/update-balance/${userId}`, 'POST', { balance });
+                if (result.success) {
+                    showMessage('Stanje posodobljeno!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function sendContact(formData) {
+            try {
+                const result = await apiCall('/contact', 'POST', formData);
+                if (result.success) {
+                    showMessage('Sporočilo uspešno poslano!', 'success');
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // Screen rendering functions
+        function renderHomeScreen() {
+            return `
+                <div class="min-h-screen gradient-bg">
+                    <div class="container mx-auto p-4">
+                        <!-- Logo et nom de la banque -->
+                        <div class="text-center mb-6 pt-8">
+                            <div class="flex items-center justify-center gap-3 mb-4">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-2xl">🏦</span>
+                                </div>
+                                <h1 class="text-2xl font-bold text-red-600">GLOBALNA EVROPSKA BANKA</h1>
+                            </div>
+                            
+                            <!-- Texte défilant animé -->
+                            <div class="bg-white/20 rounded-lg p-3 mb-6">
+                                <div class="overflow-hidden">
+                                    <div class="animate-pulse-slow">
+                                        <p class="text-blue-800 font-medium text-center" id="scrollingText">
+                                            ${scrollingTexts[appState.currentImageIndex]}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Images défilantes -->
+                        <div class="bg-white rounded-lg card-shadow p-6 mb-8" id="imageCarousel">
+                            <div class="text-center mb-4">
+                                <div class="text-6xl mb-4">${bankImages[appState.currentImageIndex].icon}</div>
+                                <h3 class="text-xl font-bold text-gray-800 mt-2">
+                                    ${bankImages[appState.currentImageIndex].title}
+                                </h3>
+                                <p class="text-gray-600">
+                                    ${bankImages[appState.currentImageIndex].desc}
+                                </p>
+                            </div>
+                            
+                            <!-- Indicateurs -->
+                            <div class="flex justify-center gap-2">
+                                ${bankImages.map((_, index) => `
+                                    <div class="w-2 h-2 rounded-full ${
+                                        index === appState.currentImageIndex ? 'bg-blue-600' : 'bg-gray-300'
+                                    }"></div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="space-y-4">
+                            <button 
+                                onclick="showScreen('login')"
+                                class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
+                            >
+                                PRIJAVA
+                            </button>
+                            
+                            <button 
+                                onclick="showScreen('register')"
+                                class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
+                            >
+                                REGISTRACIJA
+                            </button>
+
+                            <button 
+                                onclick="showScreen('contact')"
+                                class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
+                            >
+                                KONTAKTIRAJTE NAS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLoginScreen() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-blue-400 to-blue-600 p-4">
+                    <div class="container mx-auto max-w-md">
+                        <div class="bg-white rounded-lg card-shadow p-6 mt-20">
+                            <button 
+                                onclick="showScreen('home')"
+                                class="flex items-center text-blue-600 mb-6 hover:text-blue-800"
+                            >
+                                ← Nazaj
+                            </button>
+                            
+                            <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Prijava</h2>
+                            
+                            <form onsubmit="handleLogin(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">ID/Potni list</label>
+                                    <input 
+                                        type="text"
+                                        id="loginUsername"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                        placeholder="Vnesite vaš ID ali potni list"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Geslo</label>
+                                    <input 
+                                        type="password"
+                                        id="loginPassword"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                        placeholder="Vnesite geslo"
+                                    />
+                                </div>
+                                
+                                <button 
+                                    type="submit"
+                                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+                                >
+                                    Prijavite se
+                                </button>
+                                
+                                <div class="text-center text-sm text-gray-600 mt-4 p-3 bg-gray-50 rounded">
+                                    <p class="font-semibold mb-2">Test računi:</p>
+                                    <p>Admin: <code>admin</code> / <code>admin</code></p>
+                                    <p>Uporabnik: registrirajte se in počakajte na odobritev</p>
+                                </div>
+                                
+                                <p class="text-center text-gray-600">
+                                    Nimate računa? 
+                                    <span 
+                                        onclick="showScreen('register')"
+                                        class="text-blue-600 cursor-pointer ml-1 hover:underline"
+                                    >
+                                        Registrirajte se
+                                    </span>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRegisterScreen() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-green-400 to-green-600 p-4">
+                    <div class="container mx-auto max-w-md">
+                        <div class="bg-white rounded-lg card-shadow p-6 mt-10">
+                            <button 
+                                onclick="showScreen('home')"
+                                class="flex items-center text-green-600 mb-6 hover:text-green-800"
+                            >
+                                ← Nazaj
+                            </button>
+                            
+                            <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Registracija</h2>
+                            
+                            <form onsubmit="handleRegister(event)" class="space-y-4 max-h-96 overflow-y-auto">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Spol</label>
+                                    <div class="flex gap-4">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="civilite" value="Moški" required class="mr-2"/>
+                                            Moški
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="civilite" value="Ženska" required class="mr-2"/>
+                                            Ženska
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Ime</label>
+                                        <input 
+                                            type="text"
+                                            name="ime"
+                                            required
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                            placeholder="Ime"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Priimek</label>
+                                        <input 
+                                            type="text"
+                                            name="priimek"
+                                            required
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                            placeholder="Priimek"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Datum rojstva</label>
+                                    <input 
+                                        type="date"
+                                        name="dateNaissance"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Številka osebne izkaznice ali potnega lista</label>
+                                    <input 
+                                        type="text"
+                                        name="numeroId"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="Številka dokumenta"
+                                    />
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Država</label>
+                                        <select 
+                                            name="pays"
+                                            required
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        >
+                                            <option value="Slovenija">Slovenija</option>
+                                            <option value="Hrvaška">Hrvaška</option>
+                                            <option value="Avstrija">Avstrija</option>
+                                            <option value="Italija">Italija</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Mesto</label>
+                                        <input 
+                                            type="text"
+                                            name="ville"
+                                            required
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                            placeholder="Mesto"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Naslov</label>
+                                    <input 
+                                        type="text"
+                                        name="adresse"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="Polni naslov"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Telefonska številka</label>
+                                    <input 
+                                        type="tel"
+                                        name="telephone"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="+386 XX XXX XXX"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">E-pošta</label>
+                                    <input 
+                                        type="email"
+                                        name="email"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="ime@email.com"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Geslo</label>
+                                    <input 
+                                        type="password"
+                                        name="motDePasse"
+                                        required
+                                        minlength="6"
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="Ustvarite geslo (min. 6 znakov)"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Potrdite geslo</label>
+                                    <input 
+                                        type="password"
+                                        name="confirmerMotDePasse"
+                                        required
+                                        minlength="6"
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                                        placeholder="Ponovite geslo"
+                                    />
+                                </div>
+
+                                <button 
+                                    type="submit"
+                                    class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-colors"
+                                >
+                                    VALIDIRAJ
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDashboardScreen() {
+            const user = appState.userAccount;
+            return `
+                <div class="min-h-screen bg-black text-white">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center p-4 border-b border-gray-800">
+                        <div class="flex flex-col space-y-1">
+                            <div class="w-6 h-1 bg-white rounded"></div>
+                            <div class="w-6 h-1 bg-white rounded"></div>
+                            <div class="w-6 h-1 bg-white rounded"></div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-white font-bold">19:10</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="logout()" class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs">
+                                🚪
+                            </button>
+                            <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs">🔔</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Info -->
+                    <div class="text-center p-6">
+                        <p class="text-gray-400 text-sm mb-2">ŠTEVILKA RAČUNA</p>
+                        <h1 class="text-2xl font-bold mb-6">${user?.accountNumber || 'SI56 3300 0001 3772 148'}</h1>
+                        
+                        <div class="flex items-center justify-center gap-2 mb-4">
+                            <p class="text-gray-400">Razpoložljivo stanje</p>
+                            <div class="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
+                                <span class="text-xs">i</span>
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-4xl font-bold mb-8">${user?.balance || '0,00'} €</h2>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-4 gap-4 mb-8">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="text-white text-2xl">💶</span>
+                                </div>
+                                <p class="text-xs">Narediti</p>
+                                <p class="text-xs">Transfer</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="text-white text-2xl">%</span>
+                                </div>
+                                <p class="text-xs">Bizum</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="text-white text-2xl">💳</span>
+                                </div>
+                                <p class="text-xs">Skleniti</p>
+                                <p class="text-xs">izdelke</p>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-16 h-16 border-2 border-white rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="text-white text-2xl">...</span>
+                                </div>
+                                <p class="text-xs">Več možnosti</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Section -->
+                    <div class="px-4">
+                        <h3 class="text-xl font-bold mb-4">Izdelki dneva v dan</h3>
+                        <p class="text-gray-400 mb-4">Skupno stanje ${user?.balance || '0,00'} €</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-20">
+                            <!-- Current Account Card -->
+                            <div class="bg-blue-400 rounded-lg p-4">
+                                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mb-4">
+                                    <span class="text-blue-600 text-2xl">💳</span>
+                                </div>
+                                <p class="text-xs text-blue-900">RAČUN ...${user?.accountNumber?.slice(-4) || '1442'} | Imetnik</p>
+                                <h4 class="text-lg font-bold text-black mb-4">
+                                    CTA<br/>
+                                    TEKOČI...
+                                </h4>
+                                <p class="text-xs text-blue-900 mb-1">Razpoložljivo stanje</p>
+                                <p class="text-2xl font-bold text-black">${user?.balance || '0,00'} €</p>
+                            </div>
+                            
+                            <!-- Debit Card -->
+                            <div class="bg-gray-300 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-8 bg-black rounded flex items-center justify-center">
+                                        <span class="text-white text-xs">💳</span>
+                                    </div>
+                                    <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                                        <span class="text-black text-xs">!</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-700">DEBETNA KARTICA ...570...</p>
+                                <h4 class="text-lg font-bold text-black mb-4">
+                                    OPEN DEBIT<br/>
+                                    MASTERCARD
+                                </h4>
+                                <p class="text-xs text-gray-700 mb-1">Povezani račun</p>
+                                <p class="text-sm text-black">CTA KORR... ...${user?.accountNumber?.slice(-4) || '1442'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Navigation -->
+                    <div class="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800">
+                        <div class="grid grid-cols-5 py-4">
+                            <div class="text-center">
+                                <span class="text-pink-600 text-2xl">💳</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-6 h-6 mx-auto mb-1 border border-gray-400 rounded"></div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-6 h-6 mx-auto mb-1 border border-gray-400 rounded"></div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-6 h-6 mx-auto mb-1 border border-gray-400 rounded"></div>
+                            </div>
+                            <div class="text-center">
+                                <button 
+                                    onclick="logout()"
+                                    class="w-6 h-6 mx-auto mb-1 border border-gray-400 rounded flex items-center justify-center hover:bg-gray-700"
+                                >
+                                    <span class="text-xs">🚪</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminScreen() {
+            return `
+                <div class="min-h-screen bg-gray-100 p-4">
+                    <div class="container mx-auto">
+                        <div class="bg-white rounded-lg card-shadow p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Nadzorna plošča administratorja</h2>
+                                <button 
+                                    onclick="logout()"
+                                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                                >
+                                    Odjava
+                                </button>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="border border-gray-300 p-3 text-left">ID</th>
+                                            <th class="border border-gray-300 p-3 text-left">Ime</th>
+                                            <th class="border border-gray-300 p-3 text-left">Priimek</th>
+                                            <th class="border border-gray-300 p-3 text-left">E-pošta</th>
+                                            <th class="border border-gray-300 p-3 text-left">Telefon</th>
+                                            <th class="border border-gray-300 p-3 text-left">Številka računa</th>
+                                            <th class="border border-gray-300 p-3 text-left">Stanje</th>
+                                            <th class="border border-gray-300 p-3 text-left">Status</th>
+                                            <th class="border border-gray-300 p-3 text-left">Dejanja</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${appState.pendingAccounts.map((account) => `
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="border border-gray-300 p-3">${account._id.slice(-6)}</td>
+                                                <td class="border border-gray-300 p-3">${account.ime}</td>
+                                                <td class="border border-gray-300 p-3">${account.priimek}</td>
+                                                <td class="border border-gray-300 p-3">${account.email}</td>
+                                                <td class="border border-gray-300 p-3">${account.telephone}</td>
+                                                <td class="border border-gray-300 p-3">
+                                                    ${account.accountNumber || `
+                                                        <button 
+                                                            onclick="approveUser('${account._id}')"
+                                                            class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                                                            ${account.status !== 'pending' ? 'disabled' : ''}
+                                                        >
+                                                            Dodeli številko
+                                                        </button>
+                                                    `}
+                                                </td>
+                                                <td class="border border-gray-300 p-3">
+                                                    <div class="flex items-center gap-2">
+                                                        <span>${account.balance} €</span>
+                                                        <button 
+                                                            onclick="showBalanceModal('${account._id}', '${account.balance}')"
+                                                            class="text-blue-600 hover:text-blue-800 text-sm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="border border-gray-300 p-3">
+                                                    <span class="px-2 py-1 rounded text-xs ${
+                                                        account.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
+                                                        account.status === 'approved' ? 'bg-green-200 text-green-800' :
+                                                        'bg-red-200 text-red-800'
+                                                    }">
+                                                        ${account.status === 'pending' ? 'V teku' :
+                                                         account.status === 'approved' ? 'Odobreno' : 'Blokirano'}
+                                                    </span>
+                                                </td>
+                                                <td class="border border-gray-300 p-3">
+                                                    <div class="flex gap-2">
+                                                        ${account.status === 'pending' ? `
+                                                            <button 
+                                                                onclick="approveUser('${account._id}')"
+                                                                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                                                            >
+                                                                Odobri
+                                                            </button>
+                                                            <button 
+                                                                onclick="blockUser('${account._id}')"
+                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                                            >
+                                                                Blokiraj
+                                                            </button>
+                                                        ` : account.status === 'approved' ? `
+                                                            <button 
+                                                                onclick="blockUser('${account._id}')"
+                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                                            >
+                                                                Blokiraj
+                                                            </button>
+                                                        ` : ''}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            ${appState.pendingAccounts.length === 0 ? `
+                                <div class="text-center py-8 text-gray-500">
+                                    Ni računov za obdelavo
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Modal pour modifier le solde -->
+                    <div id="balanceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+                            <h3 class="text-lg font-bold mb-4">Posodobi stanje</h3>
+                            <input 
+                                type="text" 
+                                id="newBalanceInput" 
+                                placeholder="0,00"
+                                class="w-full p-3 border rounded-lg mb-4"
+                            />
+                            <div class="flex gap-2">
+                                <button 
+                                    onclick="saveBalance()"
+                                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                >
+                                    Shrani
+                                </button>
+                                <button 
+                                    onclick="closeBalanceModal()"
+                                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                                >
+                                    Prekliči
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderWaitingScreen() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center p-4">
+                    <div class="bg-white rounded-lg card-shadow p-8 text-center max-w-md">
+                        <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span class="text-white text-3xl">🏦</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Hvala za registracijo!</h2>
+                        <p class="text-gray-600 mb-6">
+                            Vaš bančni račun je v postopku odpiranja. Prosimo, počakajte.
+                        </p>
+                        <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-6"></div>
+                        <button 
+                            onclick="showScreen('home')"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Nazaj na začetek
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContactScreen() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-red-400 to-red-600 p-4">
+                    <div class="container mx-auto max-w-md">
+                        <div class="bg-white rounded-lg card-shadow p-6 mt-20">
+                            <button 
+                                onclick="showScreen('home')"
+                                class="flex items-center text-red-600 mb-6 hover:text-red-800"
+                            >
+                                ← Nazaj
+                            </button>
+                            
+                            <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Kontaktirajte nas</h2>
+                            
+                            <form onsubmit="handleContact(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Ime</label>
+                                    <input 
+                                        type="text"
+                                        name="ime"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                                        placeholder="Vaše ime"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">E-pošta</label>
+                                    <input 
+                                        type="email"
+                                        name="email"
+                                        required
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                                        placeholder="ime@email.com"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Sporočilo</label>
+                                    <textarea 
+                                        name="sporocilo"
+                                        required
+                                        rows="4"
+                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                                        placeholder="Napišite vaše sporočilo..."
+                                    ></textarea>
+                                </div>
+                                
+                                <button 
+                                    type="submit"
+                                    class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition-colors"
+                                >
+                                    📧 Pošljite sporočilo
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Event handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            login(username, password);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (data.motDePasse !== data.confirmerMotDePasse) {
+                showMessage('Gesli se ne ujemata', 'error');
+                return;
+            }
+            
+            register(data);
+        }
+
+        function handleContact(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            sendContact(data);
+            event.target.reset();
+        }
+
+        // Admin modal functions
+        let currentEditingUserId = null;
+
+        function showBalanceModal(userId, currentBalance) {
+            currentEditingUserId = userId;
+            document.getElementById('newBalanceInput').value = currentBalance.replace(' €', '');
+            document.getElementById('balanceModal').classList.remove('hidden');
+        }
+
+        function closeBalanceModal() {
+            document.getElementById('balanceModal').classList.add('hidden');
+            currentEditingUserId = null;
+        }
+
+        function saveBalance() {
+            const newBalance = document.getElementById('newBalanceInput').value;
+            if (currentEditingUserId && newBalance) {
+                updateBalance(currentEditingUserId, newBalance);
+                closeBalanceModal();
+            }
+        }
+
+        // Main render function
+        function renderCurrentScreen() {
+            const app = document.getElementById('app');
+            
+            switch (appState.currentScreen) {
+                case 'home':
+                    app.innerHTML = renderHomeScreen();
+                    break;
+                case 'login':
+                    app.innerHTML = renderLoginScreen();
+                    break;
+                case 'register':
+                    app.innerHTML = renderRegisterScreen();
+                    break;
+                case 'dashboard':
+                    app.innerHTML = renderDashboardScreen();
+                    break;
+                case 'admin':
+                    app.innerHTML = renderAdminScreen();
+                    break;
+                case 'waiting':
+                    app.innerHTML = renderWaitingScreen();
+                    break;
+                case 'contact':
+                    app.innerHTML = renderContactScreen();
+                    break;
+                default:
+                    app.innerHTML = renderHomeScreen();
+            }
+        }
+
+        // Auto login check
+        async function checkAutoLogin() {
+            if (authToken) {
+                try {
+                    const result = await apiCall('/user/profile');
+                    if (result.success) {
+                        currentUser = result.user;
+                        appState.isLoggedIn = true;
+                        appState.isAdmin = result.user.isAdmin;
+                        
+                        if (result.user.isAdmin) {
+                            showScreen('admin');
+                            loadAdminData();
+                        } else {
+                            appState.userAccount = result.user;
+                            showScreen('dashboard');
+                        }
+                        return;
+                    }
+                } catch (error) {
+                    console.log('Auto login failed');
+                    localStorage.removeItem('authToken');
+                    authToken = null;
+                }
+            }
+            showScreen('home');
+        }
+
+        // Initialize app
+        function initApp() {
+            // Image carousel
+            setInterval(() => {
+                appState.currentImageIndex = (appState.currentImageIndex + 1) % bankImages.length;
+                if (appState.currentScreen === 'home') {
+                    const scrollingText = document.getElementById('scrollingText');
+                    const imageCarousel = document.getElementById('imageCarousel');
+                    if (scrollingText) {
+                        scrollingText.textContent = scrollingTexts[appState.currentImageIndex];
+                    }
+                    if (imageCarousel) {
+                        renderCurrentScreen();
+                    }
+                }
+            }, 3000);
+
+            // Check auto login
+            checkAutoLogin();
+        }
+
+        // Start app when page loads
+        window.addEventListener('load', () => {
+            document.getElementById('loading').style.display = 'none';
+            initApp();
+        });
+    </script>
+</body>
+</html>
