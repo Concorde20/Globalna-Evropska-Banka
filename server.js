@@ -278,7 +278,7 @@ app.post('/api/admin/approve-user/:userId', authenticateToken, async (req, res) 
 
     const { userId } = req.params;
     
-    // Générer numéro de compte
+   // Générer numéro de compte
     const generateAccountNumber = () => {
       const formats = ['SI56 3300 0001 3772', 'ES71 1491 0001 2130'];
       const randomFormat = formats[Math.floor(Math.random() * formats.length)];
@@ -335,6 +335,32 @@ app.post('/api/admin/block-user/:userId', authenticateToken, async (req, res) =>
   }
 });
 
+app.post('/api/admin/unblock-user/:userId', authenticateToken, async (req, res) => {
+  try {
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ success: false, message: 'Dostop zavrnjen' });
+    }
+
+    const { userId } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { status: 'approved' },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
+    }
+
+    console.log('✅ User unblocked:', user.email);
+    res.json({ success: true, message: 'Uporabnik odblokiran', user });
+  } catch (error) {
+    console.error('❌ Error unblocking user:', error);
+    res.status(500).json({ success: false, message: 'Napaka strežnika' });
+  }
+});
+
 app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res) => {
   try {
     if (!req.user.isAdmin) {
@@ -361,19 +387,34 @@ app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
-app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res) => {
-  // ... tout le code existant ...
-});
-
-// ← AJOUTEZ ICI les nouvelles routes
-
-app.post('/api/admin/unblock-user/:userId', authenticateToken, async (req, res) => {
-  // ... nouveau code ...
-});
 
 app.post('/api/admin/update-account/:userId', authenticateToken, async (req, res) => {
-  // ... nouveau code ...
+  try {
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ success: false, message: 'Dostop zavrnjen' });
+    }
+
+    const { userId } = req.params;
+    const { accountNumber } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { accountNumber: accountNumber },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
+    }
+
+    console.log('🔢 Account number updated for user:', user.email, 'New account:', accountNumber);
+    res.json({ success: true, message: 'Številka računa posodobljena', user });
+  } catch (error) {
+    console.error('❌ Error updating account number:', error);
+    res.status(500).json({ success: false, message: 'Napaka strežnika' });
+  }
 });
+
 // Route pour obtenir les données utilisateur
 app.get('/api/user/profile', authenticateToken, async (req, res) => {
   try {
