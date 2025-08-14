@@ -1034,6 +1034,18 @@
             document.getElementById('loading').style.display = 'none';
             initApp();
         });
+        function updateFileName(input) {
+            const fileName = document.getElementById('fileName');
+            if (input.files && input.files[0]) {
+                fileName.textContent = input.files[0].name;
+                fileName.classList.remove('text-gray-500');
+                fileName.classList.add('text-gray-800');
+            } else {
+                fileName.textContent = 'Izberite datoteko...';
+                fileName.classList.remove('text-gray-800');
+                fileName.classList.add('text-gray-500');
+            }
+        }
     </script>
 </body>
 </html>
