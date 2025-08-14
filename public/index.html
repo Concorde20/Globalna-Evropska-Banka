@@ -981,7 +981,52 @@
                 closeBalanceModal();
             }
         }
+      // Fonctions pour débloquer
+        async function unblockUser(userId) {
+            try {
+                const result = await apiCall(`/admin/unblock-user/${userId}`, 'POST');
+                if (result.success) {
+                    showMessage('Uporabnik odblokiran!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
 
+        // Fonctions pour numéro de compte
+        let currentEditingAccountId = null;
+
+        function showAccountModal(userId, currentAccount) {
+            currentEditingAccountId = userId;
+            document.getElementById('newAccountInput').value = currentAccount;
+            document.getElementById('accountModal').classList.remove('hidden');
+        }
+
+        function closeAccountModal() {
+            document.getElementById('accountModal').classList.add('hidden');
+            currentEditingAccountId = null;
+        }
+
+        function saveAccount() {
+            const newAccount = document.getElementById('newAccountInput').value;
+            if (currentEditingAccountId && newAccount) {
+                updateAccountNumber(currentEditingAccountId, newAccount);
+                closeAccountModal();
+            }
+        }
+
+        async function updateAccountNumber(userId, accountNumber) {
+            try {
+                const result = await apiCall(`/admin/update-account/${userId}`, 'POST', { accountNumber });
+                if (result.success) {
+                    showMessage('Številka računa posodobljena!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
         // Main render function
         function renderCurrentScreen() {
             const app = document.getElementById('app');
