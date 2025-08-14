@@ -745,31 +745,38 @@
                                                          account.status === 'approved' ? 'Odobreno' : 'Blokirano'}
                                                     </span>
                                                 </td>
-                                                <td class="border border-gray-300 p-3">
-                                                    <div class="flex gap-2">
-                                                        ${account.status === 'pending' ? `
-                                                            <button 
-                                                                onclick="approveUser('${account._id}')"
-                                                                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-                                                            >
-                                                                Odobri
-                                                            </button>
-                                                            <button 
-                                                                onclick="blockUser('${account._id}')"
-                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                                                            >
-                                                                Blokiraj
-                                                            </button>
-                                                        ` : account.status === 'approved' ? `
-                                                            <button 
-                                                                onclick="blockUser('${account._id}')"
-                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                                                            >
-                                                                Blokiraj
-                                                            </button>
-                                                        ` : ''}
-                                                    </div>
-                                                </td>
+                                               <td class="border border-gray-300 p-3">
+    <div class="flex gap-2">
+        ${account.status === 'pending' ? `
+            <button 
+                onclick="approveUser('${account._id}')"
+                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+            >
+                Odobri
+            </button>
+            <button 
+                onclick="blockUser('${account._id}')"
+                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+            >
+                Blokiraj
+            </button>
+        ` : account.status === 'approved' ? `
+            <button 
+                onclick="blockUser('${account._id}')"
+                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+            >
+                Blokiraj
+            </button>
+        ` : account.status === 'blocked' ? `
+            <button 
+                onclick="unblockUser('${account._id}')"
+                class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
+            >
+                Odblokiranje
+            </button>
+        ` : ''}
+    </div>
+</td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
