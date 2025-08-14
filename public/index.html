@@ -818,6 +818,32 @@
                         </div>
                     </div>
                 </div>
+                <!-- Modal pour modifier le numéro de compte -->
+<div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+        <h3 class="text-lg font-bold mb-4">Posodobi številko računa</h3>
+        <input 
+            type="text" 
+            id="newAccountInput" 
+            placeholder="SI56 3300 0001 3772 1234"
+            class="w-full p-3 border rounded-lg mb-4"
+        />
+        <div class="flex gap-2">
+            <button 
+                onclick="saveAccount()"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+                Shrani
+            </button>
+            <button 
+                onclick="closeAccountModal()"
+                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+            >
+                Prekliči
+            </button>
+        </div>
+    </div>
+</div>
             `;
         }
 
