@@ -361,7 +361,19 @@ app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
+app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res) => {
+  // ... tout le code existant ...
+});
 
+// ← AJOUTEZ ICI les nouvelles routes
+
+app.post('/api/admin/unblock-user/:userId', authenticateToken, async (req, res) => {
+  // ... nouveau code ...
+});
+
+app.post('/api/admin/update-account/:userId', authenticateToken, async (req, res) => {
+  // ... nouveau code ...
+});
 // Route pour obtenir les données utilisateur
 app.get('/api/user/profile', authenticateToken, async (req, res) => {
   try {
