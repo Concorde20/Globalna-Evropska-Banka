@@ -144,7 +144,7 @@ app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
     // Compte admin par défaut
-    if (username === 'admin' && password === 'admin') {
+if (username === 'admin' && password === 'Primaire20252025') {
       const token = jwt.sign(
         { userId: 'admin', isAdmin: true },
         process.env.JWT_SECRET || 'default-secret',
