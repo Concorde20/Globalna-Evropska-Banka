@@ -11,16 +11,27 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/globalna-banka';
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ Connecté à MongoDB'))
-  .catch(err => console.error('❌ Erreur MongoDB:', err));
+const MONGODB_URI = process.env.MONGODB_URI;
+console.log('🔗 Connecting to MongoDB...');
 
-// Schémas MongoDB
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('✅ Successfully connected to MongoDB');
+})
+.catch(err => {
+  console.error('❌ MongoDB connection error:', err);
+  process.exit(1);
+});
+
+// Schéma utilisateur
 const UserSchema = new mongoose.Schema({
   civilite: { type: String, required: true },
   ime: { type: String, required: true },
@@ -49,13 +60,34 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Test de santé
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
 // Inscription
 app.post('/api/register', async (req, res) => {
   try {
+    console.log('📝 Registration attempt:', req.body);
+    
     const {
       civilite, ime, priimek, dateNaissance, numeroId,
       pays, ville, adresse, telephone, email, motDePasse
     } = req.body;
+
+    // Validation des champs requis
+    if (!civilite || !ime || !priimek || !dateNaissance || !numeroId || 
+        !pays || !ville || !adresse || !telephone || !email || !motDePasse) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vsa polja so obvezna'
+      });
+    }
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
@@ -63,6 +95,7 @@ app.post('/api/register', async (req, res) => {
     });
 
     if (existingUser) {
+      console.log('❌ User already exists:', { email, numeroId });
       return res.status(400).json({
         success: false,
         message: 'Uporabnik s to e-pošto ali ID že obstaja'
@@ -70,7 +103,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     // Hasher le mot de passe
-    const hashedPassword = await bcrypt.hash(motDePasse, 10);
+    const hashedPassword = await bcrypt.hash(motDePasse, 12);
 
     // Créer nouvel utilisateur
     const newUser = new User({
@@ -80,6 +113,7 @@ app.post('/api/register', async (req, res) => {
     });
 
     await newUser.save();
+    console.log('✅ User registered successfully:', newUser.email);
 
     res.status(201).json({
       success: true,
@@ -87,10 +121,18 @@ app.post('/api/register', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Napaka pri registraciji:', error);
+    console.error('❌ Registration error:', error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'E-pošta ali ID že obstaja'
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Napaka strežnika'
+      message: 'Napaka strežnika pri registraciji'
     });
   }
 });
@@ -98,16 +140,18 @@ app.post('/api/register', async (req, res) => {
 // Connexion
 app.post('/api/login', async (req, res) => {
   try {
+    console.log('🔐 Login attempt:', req.body);
     const { username, password } = req.body;
 
     // Compte admin par défaut
     if (username === 'admin' && password === 'admin') {
       const token = jwt.sign(
         { userId: 'admin', isAdmin: true },
-        process.env.JWT_SECRET || 'secret-key',
+        process.env.JWT_SECRET || 'default-secret',
         { expiresIn: '24h' }
       );
 
+      console.log('✅ Admin login successful');
       return res.json({
         success: true,
         token,
@@ -125,6 +169,7 @@ app.post('/api/login', async (req, res) => {
     });
 
     if (!user) {
+      console.log('❌ User not found:', username);
       return res.status(401).json({
         success: false,
         message: 'Napačni podatki'
@@ -134,6 +179,7 @@ app.post('/api/login', async (req, res) => {
     // Vérifier le mot de passe
     const isValidPassword = await bcrypt.compare(password, user.motDePasse);
     if (!isValidPassword) {
+      console.log('❌ Invalid password for user:', username);
       return res.status(401).json({
         success: false,
         message: 'Napačni podatki'
@@ -142,6 +188,7 @@ app.post('/api/login', async (req, res) => {
 
     // Vérifier le statut du compte
     if (user.status === 'blocked') {
+      console.log('❌ Blocked user attempted login:', username);
       return res.status(403).json({
         success: false,
         message: 'Vaš račun je blokiran'
@@ -149,6 +196,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     if (user.status === 'pending') {
+      console.log('❌ Pending user attempted login:', username);
       return res.status(403).json({
         success: false,
         message: 'Vaš račun je še vedno v obravnavi'
@@ -158,10 +206,11 @@ app.post('/api/login', async (req, res) => {
     // Générer token
     const token = jwt.sign(
       { userId: user._id, isAdmin: false },
-      process.env.JWT_SECRET || 'secret-key',
+      process.env.JWT_SECRET || 'default-secret',
       { expiresIn: '24h' }
     );
 
+    console.log('✅ User login successful:', user.email);
     res.json({
       success: true,
       token,
@@ -176,10 +225,10 @@ app.post('/api/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Napaka pri prijavi:', error);
+    console.error('❌ Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Napaka strežnika'
+      message: 'Napaka strežnika pri prijavi'
     });
   }
 });
@@ -193,7 +242,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Token manjka' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'secret-key', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'default-secret', (err, user) => {
     if (err) {
       return res.status(403).json({ success: false, message: 'Neveljaven token' });
     }
@@ -213,9 +262,10 @@ app.get('/api/admin/users', authenticateToken, async (req, res) => {
       .select('-motDePasse')
       .sort({ createdAt: -1 });
 
+    console.log('📊 Admin fetched users:', users.length);
     res.json({ success: true, users });
   } catch (error) {
-    console.error('Napaka pri pridobivanju uporabnikov:', error);
+    console.error('❌ Error fetching users:', error);
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
@@ -251,9 +301,10 @@ app.post('/api/admin/approve-user/:userId', authenticateToken, async (req, res) 
       return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
     }
 
+    console.log('✅ User approved:', user.email, 'Account:', accountNumber);
     res.json({ success: true, message: 'Uporabnik odobren', user });
   } catch (error) {
-    console.error('Napaka pri odobritvi:', error);
+    console.error('❌ Error approving user:', error);
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
@@ -276,9 +327,10 @@ app.post('/api/admin/block-user/:userId', authenticateToken, async (req, res) =>
       return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
     }
 
+    console.log('🚫 User blocked:', user.email);
     res.json({ success: true, message: 'Uporabnik blokiran', user });
   } catch (error) {
-    console.error('Napaka pri blokiranju:', error);
+    console.error('❌ Error blocking user:', error);
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
@@ -302,9 +354,10 @@ app.post('/api/admin/update-balance/:userId', authenticateToken, async (req, res
       return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
     }
 
+    console.log('💰 Balance updated for user:', user.email, 'New balance:', balance);
     res.json({ success: true, message: 'Stanje posodobljeno', user });
   } catch (error) {
-    console.error('Napaka pri posodabljanju stanja:', error);
+    console.error('❌ Error updating balance:', error);
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
@@ -330,7 +383,7 @@ app.get('/api/user/profile', authenticateToken, async (req, res) => {
 
     res.json({ success: true, user });
   } catch (error) {
-    console.error('Napaka pri pridobivanju profila:', error);
+    console.error('❌ Error fetching user profile:', error);
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
@@ -340,14 +393,14 @@ app.post('/api/contact', async (req, res) => {
   try {
     const { ime, email, sporocilo } = req.body;
     
-    console.log('Novo sporočilo:', { ime, email, sporocilo });
+    console.log('📧 New contact message:', { ime, email, sporocilo });
     
     res.json({
       success: true,
       message: 'Sporočilo uspešno poslano!'
     });
   } catch (error) {
-    console.error('Napaka pri pošiljanju sporočila:', error);
+    console.error('❌ Error sending contact message:', error);
     res.status(500).json({
       success: false,
       message: 'Napaka strežnika'
@@ -355,8 +408,26 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// Gestionnaire d'erreurs global
+app.use((err, req, res, next) => {
+  console.error('💥 Unhandled error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Napaka strežnika'
+  });
+});
+
+// Route 404
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
 // Démarrer le serveur
 app.listen(PORT, () => {
-  console.log(`🚀 Strežnik se izvaja na portu ${PORT}`);
-  console.log(`🌐 Aplikacija dostopna na: http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Application available at: http://localhost:${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/health`);
 });
