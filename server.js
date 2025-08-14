@@ -277,23 +277,10 @@ app.post('/api/admin/approve-user/:userId', authenticateToken, async (req, res) 
     }
 
     const { userId } = req.params;
-    
-   // Générer numéro de compte
-    const generateAccountNumber = () => {
-      const formats = ['SI56 3300 0001 3772', 'ES71 1491 0001 2130'];
-      const randomFormat = formats[Math.floor(Math.random() * formats.length)];
-      const randomNumber = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      return `${randomFormat} ${randomNumber}`;
-    };
-
-    const accountNumber = generateAccountNumber();
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { 
-        status: 'approved',
-        accountNumber: accountNumber
-      },
+      { status: 'approved' },
       { new: true }
     );
 
@@ -301,7 +288,7 @@ app.post('/api/admin/approve-user/:userId', authenticateToken, async (req, res) 
       return res.status(404).json({ success: false, message: 'Uporabnik ni najden' });
     }
 
-    console.log('✅ User approved:', user.email, 'Account:', accountNumber);
+    console.log('✅ User approved:', user.email);
     res.json({ success: true, message: 'Uporabnik odobren', user });
   } catch (error) {
     console.error('❌ Error approving user:', error);
