@@ -555,9 +555,18 @@
                 <div class="min-h-screen bg-black text-white">
 
                     <!-- Account Info -->
-                    <div class="text-center p-6">
-                        <p class="text-gray-400 text-sm mb-2">ŠTEVILKA RAČUNA</p>
-                        <h1 class="text-2xl font-bold mb-6">${user?.accountNumber || 'SI56 3300 0001 3772 148'}</h1>
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <p class="text-gray-400 text-sm">ŠTEVILKA RAČUNA</p>
+        <button 
+            onclick="logout()" 
+            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
+        >
+            Odjava
+        </button>
+    </div>
+    <div class="text-center">
+        <h1 class="text-2xl font-bold mb-6">${user?.accountNumber || 'SI56 3300 0001 3772 148'}</h1>
                        
                         <div class="flex items-center justify-center gap-2 mb-4">
                             <p class="text-gray-400">Razpoložljivo stanje</p>
