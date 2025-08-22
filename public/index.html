@@ -44,6 +44,7 @@
             userAccount: null,
             pendingAccounts: []
         };
+
         // Données statiques
         const scrollingTexts = [
             "Banka, ki revolucionira digitalne bančne storitve",
@@ -214,11 +215,35 @@
             }
         }
 
+        async function unblockUser(userId) {
+            try {
+                const result = await apiCall(`/admin/unblock-user/${userId}`, 'POST');
+                if (result.success) {
+                    showMessage('Uporabnik odblokiran!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
         async function updateBalance(userId, balance) {
             try {
                 const result = await apiCall(`/admin/update-balance/${userId}`, 'POST', { balance });
                 if (result.success) {
                     showMessage('Stanje posodobljeno!', 'success');
+                    loadAdminData();
+                }
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function updateAccountNumber(userId, accountNumber) {
+            try {
+                const result = await apiCall(`/admin/update-account/${userId}`, 'POST', { accountNumber });
+                if (result.success) {
+                    showMessage('Številka računa posodobljena!', 'success');
                     loadAdminData();
                 }
             } catch (error) {
@@ -239,32 +264,32 @@
 
         // Screen rendering functions
         function renderHomeScreen() {
-    return ` `
+            return `
                 <div class="min-h-screen gradient-bg">
                     <div class="container mx-auto p-4">
-
-<!-- Logo et nom de la banque -->
-<div class="text-center mb-6 pt-8">
-    <div class="flex items-center justify-center gap-3 mb-4">
-                               <div class="w-12 h-12 flex items-center justify-center">
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-12 h-12">
-        <defs>
-            <radialGradient id="blueGradient" cx="0.3" cy="0.3" r="0.8">
-                <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#1E3A8A;stop-opacity:1" />
-            </radialGradient>
-        </defs>
-        <circle cx="100" cy="100" r="85" fill="url(#blueGradient)"/>
-        <g stroke="rgba(255,255,255,0.2)" stroke-width="1" fill="none">
-            <ellipse cx="100" cy="100" rx="25" ry="85"/>
-            <ellipse cx="100" cy="100" rx="50" ry="85"/>
-            <ellipse cx="100" cy="100" rx="70" ry="85"/>
-            <line x1="15" y1="100" x2="185" y2="100"/>
-            <ellipse cx="100" cy="100" rx="85" ry="25"/>
-            <ellipse cx="100" cy="100" rx="85" ry="50"/>
-        </g>
-<text x="100" y="115" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">GEB</text>    </svg>
-</div>
+                        <!-- Logo et nom de la banque -->
+                        <div class="text-center mb-6 pt-8">
+                            <div class="flex items-center justify-center gap-3 mb-4">
+                                <div class="w-12 h-12 flex items-center justify-center">
+                                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-12 h-12">
+                                        <defs>
+                                            <radialGradient id="blueGradient" cx="0.3" cy="0.3" r="0.8">
+                                                <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#1E3A8A;stop-opacity:1" />
+                                            </radialGradient>
+                                        </defs>
+                                        <circle cx="100" cy="100" r="85" fill="url(#blueGradient)"/>
+                                        <g stroke="rgba(255,255,255,0.2)" stroke-width="1" fill="none">
+                                            <ellipse cx="100" cy="100" rx="25" ry="85"/>
+                                            <ellipse cx="100" cy="100" rx="50" ry="85"/>
+                                            <ellipse cx="100" cy="100" rx="70" ry="85"/>
+                                            <line x1="15" y1="100" x2="185" y2="100"/>
+                                            <ellipse cx="100" cy="100" rx="85" ry="25"/>
+                                            <ellipse cx="100" cy="100" rx="85" ry="50"/>
+                                        </g>
+                                        <text x="100" y="115" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">GEB</text>
+                                    </svg>
+                                </div>
                                 <h1 class="text-2xl font-bold text-red-600">GLOBALNA EVROPSKA BANKA</h1>
                             </div>
                             
@@ -273,8 +298,8 @@
                                 <div class="overflow-hidden">
                                     <div class="animate-pulse-slow">
                                         <p class="text-blue-800 font-medium text-center" id="scrollingText">
-    ${scrollingTexts[appState.currentImageIndex]}
-</p>
+                                            ${scrollingTexts[appState.currentImageIndex]}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -303,32 +328,37 @@
                         </div>
 
                         <!-- Boutons d'action -->
-<div class="space-y-4">
-    <button 
-        onclick="showScreen('login')"
-        class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
-    >
-        PRIJAVA
-    </button>
-    
-    <button 
-        onclick="showScreen('register')"
-        class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
-    >
-        REGISTRACIJA
-    </button>
+                        <div class="space-y-4">
+                            <button 
+                                onclick="showScreen('login')"
+                                class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
+                            >
+                                PRIJAVA
+                            </button>
+                            
+                            <button 
+                                onclick="showScreen('register')"
+                                class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
+                            >
+                                REGISTRACIJA
+                            </button>
 
-    <button 
-        onclick="showScreen('contact')"
-        class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
-    >
-        KONTAKTIRAJTE NAS
-    </button>
-</div>
+                            <button 
+                                onclick="showScreen('contact')"
+                                class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
+                            >
+                                KONTAKTIRAJTE NAS
+                            </button>
+                        </div>
+                    </div>
+                </div>
             `;
         }
 
         function renderLoginScreen() {
+            const [username, setUsername] = ['', ''];
+            const [password, setPassword] = ['', ''];
+
             return `
                 <div class="min-h-screen bg-gradient-to-br from-blue-400 to-blue-600 p-4">
                     <div class="container mx-auto max-w-md">
@@ -371,7 +401,6 @@
                                 >
                                     Prijavite se
                                 </button>
-                                
                                 
                                 <p class="text-center text-gray-600">
                                     Nimate računa? 
@@ -544,28 +573,30 @@
                                         placeholder="Ponovite geslo"
                                     />
                                 </div>
-<div>
-    <label class="block text-gray-700 mb-2">Priložite osebno izkaznico ali potni list</label>
-    <div class="relative">
-        <input 
-            type="file"
-            name="documentUpload"
-            accept="image/*,.pdf"
-            required
-            id="fileInput"
-            class="hidden"
-            onchange="updateFileName(this)"
-        />
-        <label 
-            for="fileInput"
-            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white cursor-pointer flex items-center justify-between hover:bg-gray-50"
-        >
-            <span id="fileName" class="text-gray-500">Izberite datoteko...</span>
-            <span class="text-gray-400">📎</span>
-        </label>
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Sprejemamo: JPG, PNG, PDF (maks. 5MB)</p>
-</div>
+
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Priložite osebno izkaznico ali potni list</label>
+                                    <div class="relative">
+                                        <input 
+                                            type="file"
+                                            name="documentUpload"
+                                            accept="image/*,.pdf"
+                                            required
+                                            id="fileInput"
+                                            class="hidden"
+                                            onchange="updateFileName(this)"
+                                        />
+                                        <label 
+                                            for="fileInput"
+                                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 bg-white cursor-pointer flex items-center justify-between hover:bg-gray-50"
+                                        >
+                                            <span id="fileName" class="text-gray-500">Izberite datoteko...</span>
+                                            <span class="text-gray-400">📎</span>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Sprejemamo: JPG, PNG, PDF (maks. 5MB)</p>
+                                </div>
+
                                 <button 
                                     type="submit"
                                     class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-colors"
@@ -583,86 +614,86 @@
             const user = appState.userAccount;
             return `
                 <div class="min-h-screen bg-black text-white" style="background-color: #000000 !important;">
+                    <!-- Account Info -->
+                    <div class="p-6">
+                        <!-- Ligne du bouton de déconnexion -->
+                        <div class="flex justify-end mb-4">
+                            <button 
+                                onclick="logout()" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
+                            >
+                                Odjava
+                            </button>
+                        </div>
+                        
+                        <!-- Ligne ŠTEVILKA RAČUNA centrée -->
+                        <div class="text-center mb-6">
+                            <p class="text-gray-400 text-sm mb-2">ŠTEVILKA RAČUNA</p>
+                            <h1 class="text-2xl font-bold mb-6">\${user?.accountNumber || 'SI56 3300 0001 3772 148'}</h1>
+                            
+                            <div class="flex items-center justify-center gap-2 mb-4">
+                                <p class="text-gray-400">Razpoložljivo stanje</p>
+                                <div class="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
+                                    <span class="text-xs">i</span>
+                                </div>
+                            </div>
+                            
+                            <h2 class="text-4xl font-bold mb-8">\${user?.balance || '0,00'} €</h2>
 
-                   <!-- Account Info -->
-<div class="p-6">
-    <!-- Ligne du bouton de déconnexion -->
-    <div class="flex justify-end mb-4">
-        <button 
-            onclick="logout()" 
-            class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
-        >
-            Odjava
-        </button>
-    </div>
-    
-    <!-- Ligne ŠTEVILKA RAČUNA centrée -->
-    <div class="text-center mb-6">
-        <p class="text-gray-400 text-sm mb-2">ŠTEVILKA RAČUNA</p>
-        <h1 class="text-2xl font-bold mb-6">${user?.accountNumber || 'SI56 3300 0001 3772 148'}</h1>
-        
-        <div class="flex items-center justify-center gap-2 mb-4">
-            <p class="text-gray-400">Razpoložljivo stanje</p>
-            <div class="w-4 h-4 border border-gray-400 rounded-full flex items-center justify-center">
-                <span class="text-xs">i</span>
-            </div>
-        </div>
-        
-        <h2 class="text-4xl font-bold mb-8">${user?.balance || '0,00'} €</h2>
-    </div>
-                        <!-- Action Buttons -->
-                        <div class="grid grid-cols-4 gap-4 mb-8">
-                            <div class="text-center">
-                                <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <span class="text-white text-2xl">💶</span>
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-4 gap-4 mb-8">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <span class="text-white text-2xl">💶</span>
+                                    </div>
+                                    <p class="text-xs">Narediti</p>
+                                    <p class="text-xs">Transfer</p>
                                 </div>
-                                <p class="text-xs">Narediti</p>
-                                <p class="text-xs">Transfer</p>
-                            </div>
-                            
-                           <div class="text-center">
-    <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
-        <span class="text-white text-2xl">💰</span>
-    </div>
-    <p class="text-xs">Zahteva za</p>
-    <p class="text-xs">kredit</p>
-</div>
-                            
-                            <div class="text-center">
-                                <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <span class="text-white text-2xl">💳</span>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <span class="text-white text-2xl">💰</span>
+                                    </div>
+                                    <p class="text-xs">Zahteva za</p>
+                                    <p class="text-xs">kredit</p>
                                 </div>
-                                <p class="text-xs">Skleniti</p>
-                                <p class="text-xs">izdelke</p>
-                            </div>
-                            
-                            <div class="text-center">
-                                <div class="w-16 h-16 border-2 border-white rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <span class="text-white text-2xl">...</span>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-pink-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <span class="text-white text-2xl">💳</span>
+                                    </div>
+                                    <p class="text-xs">Skleniti</p>
+                                    <p class="text-xs">izdelke</p>
                                 </div>
-                                <p class="text-xs">Več možnosti</p>
+                                
+                                <div class="text-center">
+                                    <div class="w-16 h-16 border-2 border-white rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <span class="text-white text-2xl">...</span>
+                                    </div>
+                                    <p class="text-xs">Več možnosti</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Products Section -->
-                    <div class="px-4 flex-1 flex flex-col">
+                    <div class="px-4 bg-black pb-8">
                         <h3 class="text-xl font-bold mb-4">Izdelki dneva v dan</h3>
-                        <p class="text-gray-400 mb-4">Skupno stanje ${user?.balance || '0,00'} €</p>
+                        <p class="text-gray-400 mb-4">Skupno stanje \${user?.balance || '0,00'} €</p>
                         
-                       <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
                             <!-- Current Account Card -->
                             <div class="bg-blue-400 rounded-lg p-4">
                                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center mb-4">
                                     <span class="text-blue-600 text-2xl">💳</span>
                                 </div>
-                                <p class="text-xs text-blue-900">RAČUN ...${user?.accountNumber?.slice(-4) || '1442'} | Imetnik</p>
+                                <p class="text-xs text-blue-900">RAČUN ...\${user?.accountNumber?.slice(-4) || '1442'} | Imetnik</p>
                                 <h4 class="text-lg font-bold text-black mb-4">
                                     CTA<br/>
                                     TEKOČI...
                                 </h4>
                                 <p class="text-xs text-blue-900 mb-1">Razpoložljivo stanje</p>
-                                <p class="text-2xl font-bold text-black">${user?.balance || '0,00'} €</p>
+                                <p class="text-2xl font-bold text-black">\${user?.balance || '0,00'} €</p>
                             </div>
                             
                             <!-- Debit Card -->
@@ -681,7 +712,7 @@
                                     MASTERCARD
                                 </h4>
                                 <p class="text-xs text-gray-700 mb-1">Povezani račun</p>
-                                <p class="text-sm text-black">CTA KORR... ...${user?.accountNumber?.slice(-4) || '1442'}</p>
+                                <p class="text-sm text-black">CTA KORR... ...\${user?.accountNumber?.slice(-4) || '1442'}</p>
                             </div>
                         </div>
                     </div>
@@ -720,29 +751,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${appState.pendingAccounts.map((account) => `
+                                        \${appState.pendingAccounts.map((account) => `
                                             <tr class="hover:bg-gray-50">
-                                                <td class="border border-gray-300 p-3">${account.numeroId}</td>
-                                                <td class="border border-gray-300 p-3">${account.ime}</td>
-                                                <td class="border border-gray-300 p-3">${account.priimek}</td>
-                                                <td class="border border-gray-300 p-3">${account.email}</td>
-                                                <td class="border border-gray-300 p-3">${account.telephone}</td>
-                                               <td class="border border-gray-300 p-3">
-    <div class="flex items-center gap-2">
-        <span>${account.accountNumber || 'Ni dodeljeno'}</span>
-        <button 
-            onclick="showAccountModal('${account._id}', '${account.accountNumber || ''}')"
-            class="text-blue-600 hover:text-blue-800 text-sm"
-        >
-            ✏️
-        </button>
-    </div>
-</td>
+                                                <td class="border border-gray-300 p-3">\${account.numeroId}</td>
+                                                <td class="border border-gray-300 p-3">\${account.ime}</td>
+                                                <td class="border border-gray-300 p-3">\${account.priimek}</td>
+                                                <td class="border border-gray-300 p-3">\${account.email}</td>
+                                                <td class="border border-gray-300 p-3">\${account.telephone}</td>
                                                 <td class="border border-gray-300 p-3">
                                                     <div class="flex items-center gap-2">
-                                                        <span>${account.balance} €</span>
+                                                        <span>\${account.accountNumber || 'Ni dodeljeno'}</span>
                                                         <button 
-                                                            onclick="showBalanceModal('${account._id}', '${account.balance}')"
+                                                            onclick="showAccountModal('\${account._id}', '\${account.accountNumber || ''}')"
                                                             class="text-blue-600 hover:text-blue-800 text-sm"
                                                         >
                                                             ✏️
@@ -750,54 +770,65 @@
                                                     </div>
                                                 </td>
                                                 <td class="border border-gray-300 p-3">
-                                                    <span class="px-2 py-1 rounded text-xs ${
+                                                    <div class="flex items-center gap-2">
+                                                        <span>\${account.balance} €</span>
+                                                        <button 
+                                                            onclick="showBalanceModal('\${account._id}', '\${account.balance}')"
+                                                            class="text-blue-600 hover:text-blue-800 text-sm"
+                                                        >
+                                                            ✏️
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="border border-gray-300 p-3">
+                                                    <span class="px-2 py-1 rounded text-xs \${
                                                         account.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
                                                         account.status === 'approved' ? 'bg-green-200 text-green-800' :
                                                         'bg-red-200 text-red-800'
                                                     }">
-                                                        ${account.status === 'pending' ? 'V teku' :
+                                                        \${account.status === 'pending' ? 'V teku' :
                                                          account.status === 'approved' ? 'Odobreno' : 'Blokirano'}
                                                     </span>
                                                 </td>
-                                               <td class="border border-gray-300 p-3">
-    <div class="flex gap-2">
-        ${account.status === 'pending' ? `
-            <button 
-                onclick="approveUser('${account._id}')"
-                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
-            >
-                Odobri
-            </button>
-            <button 
-                onclick="blockUser('${account._id}')"
-                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-            >
-                Blokiraj
-            </button>
-        ` : account.status === 'approved' ? `
-            <button 
-                onclick="blockUser('${account._id}')"
-                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-            >
-                Blokiraj
-            </button>
-        ` : account.status === 'blocked' ? `
-            <button 
-                onclick="unblockUser('${account._id}')"
-                class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
-            >
-                Odblokiranje
-            </button>
-        ` : ''}
-    </div>
-</td>
+                                                <td class="border border-gray-300 p-3">
+                                                    <div class="flex gap-2">
+                                                        \${account.status === 'pending' ? `
+                                                            <button 
+                                                                onclick="approveUser('\${account._id}')"
+                                                                class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                                                            >
+                                                                Odobri
+                                                            </button>
+                                                            <button 
+                                                                onclick="blockUser('\${account._id}')"
+                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                                            >
+                                                                Blokiraj
+                                                            </button>
+                                                        ` : account.status === 'approved' ? `
+                                                            <button 
+                                                                onclick="blockUser('\${account._id}')"
+                                                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                                                            >
+                                                                Blokiraj
+                                                            </button>
+                                                        ` : account.status === 'blocked' ? `
+                                                            <button 
+                                                                onclick="unblockUser('\${account._id}')"
+                                                                class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
+                                                            >
+                                                                Odblokiranje
+                                                            </button>
+                                                        ` : ''}
+                                                    </div>
+                                                </td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
                                 </table>
                             </div>
                             
-                            ${appState.pendingAccounts.length === 0 ? `
+                            \${appState.pendingAccounts.length === 0 ? `
                                 <div class="text-center py-8 text-gray-500">
                                     Ni računov za obdelavo
                                 </div>
@@ -831,33 +862,34 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modal pour modifier le numéro de compte -->
+                    <div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+                            <h3 class="text-lg font-bold mb-4">Posodobi številko računa</h3>
+                            <input 
+                                type="text" 
+                                id="newAccountInput" 
+                                placeholder="SI56 3300 0001 3772 1234"
+                                class="w-full p-3 border rounded-lg mb-4"
+                            />
+                            <div class="flex gap-2">
+                                <button 
+                                    onclick="saveAccount()"
+                                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                >
+                                    Shrani
+                                </button>
+                                <button 
+                                    onclick="closeAccountModal()"
+                                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                                >
+                                    Prekliči
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- Modal pour modifier le numéro de compte -->
-<div id="accountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-        <h3 class="text-lg font-bold mb-4">Posodobi številko računa</h3>
-        <input 
-            type="text" 
-            id="newAccountInput" 
-            placeholder="SI56 3300 0001 3772 1234"
-            class="w-full p-3 border rounded-lg mb-4"
-        />
-        <div class="flex gap-2">
-            <button 
-                onclick="saveAccount()"
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-                Shrani
-            </button>
-            <button 
-                onclick="closeAccountModal()"
-                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-            >
-                Prekliči
-            </button>
-        </div>
-    </div>
-</div>
             `;
         }
 
@@ -976,6 +1008,7 @@
 
         // Admin modal functions
         let currentEditingUserId = null;
+        let currentEditingAccountId = null;
 
         function showBalanceModal(userId, currentBalance) {
             currentEditingUserId = userId;
@@ -995,21 +1028,6 @@
                 closeBalanceModal();
             }
         }
-      // Fonctions pour débloquer
-        async function unblockUser(userId) {
-            try {
-                const result = await apiCall(`/admin/unblock-user/${userId}`, 'POST');
-                if (result.success) {
-                    showMessage('Uporabnik odblokiran!', 'success');
-                    loadAdminData();
-                }
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        }
-
-        // Fonctions pour numéro de compte
-        let currentEditingAccountId = null;
 
         function showAccountModal(userId, currentAccount) {
             currentEditingAccountId = userId;
@@ -1030,17 +1048,20 @@
             }
         }
 
-        async function updateAccountNumber(userId, accountNumber) {
-            try {
-                const result = await apiCall(`/admin/update-account/${userId}`, 'POST', { accountNumber });
-                if (result.success) {
-                    showMessage('Številka računa posodobljena!', 'success');
-                    loadAdminData();
-                }
-            } catch (error) {
-                showMessage(error.message, 'error');
+        // Fonction pour mettre à jour le nom du fichier
+        function updateFileName(input) {
+            const fileName = document.getElementById('fileName');
+            if (input.files && input.files[0]) {
+                fileName.textContent = input.files[0].name;
+                fileName.classList.remove('text-gray-500');
+                fileName.classList.add('text-gray-800');
+            } else {
+                fileName.textContent = 'Izberite datoteko...';
+                fileName.classList.remove('text-gray-800');
+                fileName.classList.add('text-gray-500');
             }
         }
+
         // Main render function
         function renderCurrentScreen() {
             const app = document.getElementById('app');
@@ -1126,18 +1147,6 @@
             document.getElementById('loading').style.display = 'none';
             initApp();
         });
-        function updateFileName(input) {
-            const fileName = document.getElementById('fileName');
-            if (input.files && input.files[0]) {
-                fileName.textContent = input.files[0].name;
-                fileName.classList.remove('text-gray-500');
-                fileName.classList.add('text-gray-800');
-            } else {
-                fileName.textContent = 'Izberite datoteko...';
-                fileName.classList.remove('text-gray-800');
-                fileName.classList.add('text-gray-500');
-            }
-        }
     </script>
 </body>
 </html>
