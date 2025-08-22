@@ -44,7 +44,17 @@
             userAccount: null,
             pendingAccounts: []
         };
+         // Langue simple
+let currentLang = 'sl';
 
+function setLanguage(lang) {
+    currentLang = lang;
+    showScreen('home');
+}
+
+function getText(slovenian, croatian) {
+    return currentLang === 'hr' ? croatian : slovenian;
+}
         // Données statiques
         const scrollingTexts = [
             "Banka, ki revolucionira digitalne bančne storitve",
