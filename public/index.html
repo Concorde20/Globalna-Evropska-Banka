@@ -457,28 +457,28 @@ function changeLanguage(lang) {
                         </div>
 
                         <!-- Boutons d'action -->
-                        <div class="space-y-4">
-                            <button 
-                                onclick="showScreen('login')"
-                                class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
-                            >
-                                PRIJAVA
-                            </button>
-                            
-                            <button 
-                                onclick="showScreen('register')"
-                                class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
-                            >
-                                REGISTRACIJA
-                            </button>
+<div class="space-y-4">
+    <button 
+        onclick="showScreen('login')"
+        class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
+    >
+        ${t('login')}
+    </button>
+    
+    <button 
+        onclick="showScreen('register')"
+        class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
+    >
+        ${t('register')}
+    </button>
 
-                            <button 
-                                onclick="showScreen('contact')"
-                                class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
-                            >
-                                KONTAKTIRAJTE NAS
-                            </button>
-                        </div>
+    <button 
+        onclick="showScreen('contact')"
+        class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
+    >
+        ${t('contact')}
+    </button>
+</div>
                     </div>
                 </div>
             `;
