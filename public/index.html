@@ -172,7 +172,6 @@ let currentLanguage = localStorage.getItem('language') || 'sl';
 function t(key) {
     return translations[currentLanguage][key] || translations['sl'][key] || key;
 }
-
 // Fonction pour changer de langue
 function changeLanguage(lang) {
     currentLanguage = lang;
