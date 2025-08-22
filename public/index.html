@@ -330,11 +330,8 @@ function getScrollingText() {
                             <div class="bg-white/20 rounded-lg p-3 mb-6">
                                 <div class="overflow-hidden">
                                     <div class="animate-pulse-slow">
-                                        <p class="text-blue-800 font-medium text-center" id="scrollingText">
-    ${getText(
-        scrollingTexts[appState.currentImageIndex],
-        ['Banka koja revolucionira digitalne bankovne usluge', '100 % digitalna, 100 % sigurna banka', 'Vaša budućnost bankarstva je ovdje', 'Inovativna rješenja za moderne korisnike'][appState.currentImageIndex]
-    )}
+                                       <p class="text-blue-800 font-medium text-center" id="scrollingText">
+    ${getScrollingText()}
 </p>
                                     </div>
                                 </div>
