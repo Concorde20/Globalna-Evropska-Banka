@@ -350,25 +350,25 @@ function getText(slovenian, croatian) {
                         <!-- Boutons d'action -->
                         <div class="space-y-4">
                             <button 
-                                onclick="showScreen('login')"
-                                class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
-                            >
-                                PRIJAVA
-                            </button>
-                            
-                            <button 
-                                onclick="showScreen('register')"
-                                class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
-                            >
-                                REGISTRACIJA
-                            </button>
+    onclick="showScreen('login')"
+    class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-blue-700 transition-colors"
+>
+    ${getText('PRIJAVA', 'PRIJAVA')}
+</button>
 
-                            <button 
-                                onclick="showScreen('contact')"
-                                class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
-                            >
-                                KONTAKTIRAJTE NAS
-                            </button>
+<button 
+    onclick="showScreen('register')"
+    class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg card-shadow hover:bg-green-700 transition-colors"
+>
+    ${getText('REGISTRACIJA', 'REGISTRACIJA')}
+</button>
+
+<button 
+    onclick="showScreen('contact')"
+    class="w-full bg-red-600 text-white py-3 rounded-lg font-medium card-shadow hover:bg-red-700 transition-colors"
+>
+    ${getText('KONTAKTIRAJTE NAS', 'KONTAKTIRAJTE NAS')}
+</button>
                         </div>
                     </div>
                 </div>
