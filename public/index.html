@@ -45,7 +45,7 @@
             pendingAccounts: []
         };
          // Langue simple
-let currentLang = 'sl';
+let currentLang = localStorage.getItem('selectedLanguage') || 'sl';
 
 function setLanguage(lang) {
     currentLang = lang;
