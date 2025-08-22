@@ -770,9 +770,9 @@
                                                 </td>
                                                 <td class="border border-gray-300 p-3">
                                                     <div class="flex items-center gap-2">
-                                                        <span>\${account.balance} €</span>
+                                                        <span>${account.balance} €</span>
                                                         <button 
-                                                            onclick="showBalanceModal('\${account._id}', '\${account.balance}')"
+                                                            onclick="showBalanceModal('${account._id}', '${account.balance}')"
                                                             class="text-blue-600 hover:text-blue-800 text-sm"
                                                         >
                                                             ✏️
@@ -780,7 +780,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="border border-gray-300 p-3">
-                                                    <span class="px-2 py-1 rounded text-xs \${
+                                                    <span class="px-2 py-1 rounded text-xs ${
                                                         account.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
                                                         account.status === 'approved' ? 'bg-green-200 text-green-800' :
                                                         'bg-red-200 text-red-800'
@@ -793,27 +793,27 @@
                                                     <div class="flex gap-2">
                                                         \${account.status === 'pending' ? `
                                                             <button 
-                                                                onclick="approveUser('\${account._id}')"
+                                                                onclick="approveUser('${account._id}')"
                                                                 class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
                                                             >
                                                                 Odobri
                                                             </button>
                                                             <button 
-                                                                onclick="blockUser('\${account._id}')"
+                                                                onclick="blockUser('${account._id}')"
                                                                 class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                                                             >
                                                                 Blokiraj
                                                             </button>
                                                         ` : account.status === 'approved' ? `
                                                             <button 
-                                                                onclick="blockUser('\${account._id}')"
+                                                                onclick="blockUser('${account._id}')"
                                                                 class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
                                                             >
                                                                 Blokiraj
                                                             </button>
                                                         ` : account.status === 'blocked' ? `
                                                             <button 
-                                                                onclick="unblockUser('\${account._id}')"
+                                                                onclick="unblockUser('${account._id}')"
                                                                 class="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700"
                                                             >
                                                                 Odblokiranje
