@@ -178,9 +178,6 @@ function t(key) {
 function changeLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('language', lang);
-    
-    // Forcer le re-rendu complet
-    appState.currentScreen = appState.currentScreen; // Force refresh
     renderCurrentScreen();
 }
         // Données statiques
