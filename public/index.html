@@ -55,6 +55,19 @@ function setLanguage(lang) {
 function getText(slovenian, croatian) {
     return currentLang === 'hr' ? croatian : slovenian;
 }
+
+function getScrollingText() {
+    const croatianTexts = [
+        'Banka koja revolucionira digitalne bankovne usluge',
+        '100 % digitalna, 100 % sigurna banka', 
+        'Vaša budućnost bankarstva je ovdje',
+        'Inovativna rješenja za moderne korisnike'
+    ];
+    
+    return currentLang === 'hr' ? 
+        croatianTexts[appState.currentImageIndex] : 
+        scrollingTexts[appState.currentImageIndex];
+}
         // Données statiques
         const scrollingTexts = [
             "Banka, ki revolucionira digitalne bančne storitve",
