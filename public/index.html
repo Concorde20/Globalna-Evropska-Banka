@@ -49,6 +49,7 @@ let currentLang = 'sl';
 
 function setLanguage(lang) {
     currentLang = lang;
+    localStorage.setItem('selectedLanguage', lang); // Sauvegarder la langue
     showScreen('home');
 }
 
