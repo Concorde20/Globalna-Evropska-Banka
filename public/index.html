@@ -68,6 +68,27 @@ function getScrollingText() {
         croatianTexts[appState.currentImageIndex] : 
         scrollingTexts[appState.currentImageIndex];
 }
+        // Nouvelle fonction pour les autres pages
+function getPageText(key) {
+    const translations = {
+        // Page de connexion
+        loginTitle: { sl: 'Prijava', hr: 'Prijava' },
+        username: { sl: 'ID/Potni list', hr: 'ID/Putovnica' },
+        password: { sl: 'Geslo', hr: 'Lozinka' },
+        loginButton: { sl: 'Prijavite se', hr: 'Prijavite se' },
+        back: { sl: 'Nazaj', hr: 'Natrag' },
+        
+        // Page d'inscription
+        registerTitle: { sl: 'Registracija', hr: 'Registracija' },
+        firstName: { sl: 'Ime', hr: 'Ime' },
+        lastName: { sl: 'Priimek', hr: 'Prezime' },
+        
+        // Page de contact
+        contactTitle: { sl: 'Kontaktirajte nas', hr: 'Kontaktirajte nas' }
+    };
+    
+    return translations[key] ? translations[key][currentLang] : key;
+}
         // Données statiques
         const scrollingTexts = [
             "Banka, ki revolucionira digitalne bančne storitve",
