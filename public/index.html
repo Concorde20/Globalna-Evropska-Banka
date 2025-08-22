@@ -503,13 +503,13 @@ function getPageText(key) {
                                     <label class="block text-gray-700 mb-2">${getPageText('gender')}</label>
                                     <div class="flex gap-4">
                                         <label class="flex items-center">
-                                            <input type="radio" name="civilite" value="Moški" required class="mr-2"/>
-                                            Moški
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input type="radio" name="civilite" value="Ženska" required class="mr-2"/>
-                                            Ženska
-                                        </label>
+    <input type="radio" name="civilite" value="Moški" required class="mr-2"/>
+    ${getPageText('male')}
+</label>
+<label class="flex items-center">
+    <input type="radio" name="civilite" value="Ženska" required class="mr-2"/>
+    ${getPageText('female')}
+</label>
                                     </div>
                                 </div>
 
