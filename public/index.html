@@ -359,8 +359,16 @@ sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku' }
                                         <text x="100" y="115" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">GEB</text>
                                     </svg>
                                 </div>
-                                <!-- Sélecteur de langue en haut à droite -->
+                                <!-- Drapeaux alignés en haut à droite -->
 <div class="absolute top-4 right-4 flex gap-2">
+    <!-- Drapeaux décoratifs (même taille, non-cliquables) -->
+    <div class="w-8 h-8 rounded-full text-xl opacity-50">🇪🇸</div>
+    <div class="w-8 h-8 rounded-full text-xl opacity-50">🇫🇷</div>
+    <div class="w-8 h-8 rounded-full text-xl opacity-50">🇦🇺</div>
+    <div class="w-8 h-8 rounded-full text-xl opacity-50">🇧🇪</div>
+    <div class="w-8 h-8 rounded-full text-xl opacity-50">🇩🇪</div>
+    
+    <!-- Drapeaux fonctionnels (même taille, cliquables) -->
     <button onclick="setLanguage('sl')" class="w-8 h-8 rounded-full text-xl hover:scale-110 transition-transform">
         🇸🇮
     </button>
