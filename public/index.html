@@ -1133,30 +1133,7 @@ sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku' }
                 closeAccountModal();
             }
         }
-         function saveAccount() {
-            const newAccount = document.getElementById('newAccountInput').value;
-            if (currentEditingAccountId && newAccount) {
-                updateAccountNumber(currentEditingAccountId, newAccount);
-                closeAccountModal();
-            }
-        }
-
-        // Fonction pour l'effet virtuel
-        function showVirtualPage(type) {
-            const button = event.target.closest('button');
-            if (button) {
-                // Effet d'enfoncement visuel
-                button.style.transform = 'scale(0.9)';
-                button.style.transition = 'transform 0.1s';
-                
-                setTimeout(() => {
-                    button.style.transform = 'scale(1)';
-                }, 150);
-            }
-        }
-
-        // Fonction pour mettre à jour le nom du fichier (existante)
-        function updateFileName(input) {
+        
         // Fonction pour mettre à jour le nom du fichier
         function updateFileName(input) {
             const fileName = document.getElementById('fileName');
