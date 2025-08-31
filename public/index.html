@@ -1154,7 +1154,12 @@ sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku' }
                 fileName.classList.add('text-gray-500');
             }
         }
-
+         function showVirtualPage(type) {
+    showMessage('Nalaganje...', 'info');
+    setTimeout(() => {
+        showMessage('Funkcija bo kmalu na voljo', 'info');
+    }, 2000);
+}
         // Main render function
         function renderCurrentScreen() {
             const app = document.getElementById('app');
