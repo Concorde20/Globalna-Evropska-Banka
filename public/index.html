@@ -886,10 +886,9 @@ function getPageText(key) {
                                             <th class="border border-gray-300 p-3 text-left">Priimek</th>
                                             <th class="border border-gray-300 p-3 text-left">E-pošta</th>
                                             <th class="border border-gray-300 p-3 text-left">Telefon</th>
-                                            <<th class="border border-gray-300 p-3 text-left">Številka računa</th>
-<th class="border border-gray-300 p-3 text-left">Stanje</th>
-<th class="border border-gray-300 p-3 text-left">Valuta</th>
-<th class="border border-gray-300 p-3 text-left">Status</th>
+                                            <th class="border border-gray-300 p-3 text-left">Številka računa</th>
+                                            <th class="border border-gray-300 p-3 text-left">Stanje</th>
+                                            <th class="border border-gray-300 p-3 text-left">Status</th>
                                             <th class="border border-gray-300 p-3 text-left">Dejanja</th>
                                         </tr>
                                     </thead>
@@ -923,17 +922,6 @@ function getPageText(key) {
                                                         </button>
                                                     </div>
                                                 </td>
-                                                <td class="border border-gray-300 p-3">
-    <div class="flex items-center gap-2">
-        <span>${account.currency || '€'}</span>
-        <button 
-            onclick="showCurrencyModal('${account._id}', '${account.currency || '€'}')"
-            class="text-blue-600 hover:text-blue-800 text-sm"
-        >
-            ✏️
-        </button>
-    </div>
-</td>
                                                 <td class="border border-gray-300 p-3">
                                                     <span class="px-2 py-1 rounded text-xs ${
                                                         account.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
