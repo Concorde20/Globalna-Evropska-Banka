@@ -46,6 +46,7 @@ const UserSchema = new mongoose.Schema({
   motDePasse: { type: String, required: true },
   accountNumber: { type: String, default: '' },
   balance: { type: String, default: '0,00' },
+  currency: { type: String, default: 'EUR' },
   status: { type: String, enum: ['pending', 'approved', 'blocked'], default: 'pending' },
   isAdmin: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
