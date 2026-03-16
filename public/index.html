@@ -133,28 +133,27 @@ function getPageText(key) {
             "Inovativne rešitve za moderne uporabnike"
         ];
 
-      const bankImages = [
-    {
-        icon: "📱",
-        title: "Mobilno bančništvo",
-        desc: "Dostop do vseh storitev"
-    },
-    {
-        icon: "💶",
-        title: "Transferji",
-        desc: "Hitri in varni prenosi"
-    },
-    {
-        icon: "💳",
-        title: "Plačilne kartice",
-        desc: "Brezstične plačila"
-    },
-    {
-        icon: "🏦",
-        title: "Varne storitve",
-        desc: "Zaščita vašega denarja"
-    }
-];
+       const bankImages = {
+    sl: [
+        { icon: "📱", title: "Mobilno bančništvo", desc: "Dostop do vseh storitev" },
+        { icon: "💶", title: "Transferji", desc: "Hitri in varni prenosi" },
+        { icon: "💳", title: "Plačilne kartice", desc: "Brezstične plačila" },
+        { icon: "🏦", title: "Varne storitve", desc: "Zaščita vašega denarja" }
+    ],
+    hr: [
+        { icon: "📱", title: "Mobilno bankarstvo", desc: "Pristup svim uslugama" },
+        { icon: "💶", title: "Transferi", desc: "Brzi i sigurni prijenosi" },
+        { icon: "💳", title: "Platne kartice", desc: "Beskontaktna plaćanja" },
+        { icon: "🏦", title: "Sigurne usluge", desc: "Zaštita vašeg novca" }
+    ],
+    es: [
+        { icon: "📱", title: "Banca móvil", desc: "Acceso a todos los servicios" },
+        { icon: "💶", title: "Transferencias", desc: "Transferencias rápidas y seguras" },
+        { icon: "💳", title: "Tarjetas de pago", desc: "Pagos sin contacto" },
+        { icon: "🏦", title: "Servicios seguros", desc: "Protección de su dinero" }
+    ]
+};
+
         // Fonctions utilitaires
         function showScreen(screenName) {
             appState.currentScreen = screenName;
@@ -407,17 +406,17 @@ function getPageText(key) {
                         <div class="bg-white rounded-lg card-shadow p-6 mb-8" id="imageCarousel">
                             <div class="text-center mb-4">
                                 <div class="text-6xl mb-4">${bankImages[appState.currentImageIndex].icon}</div>
-<h3 class="text-xl font-bold text-gray-800 mt-2">
-    ${bankImages[appState.currentImageIndex].title}
-</h3>
-<p class="text-gray-600">
-    ${bankImages[appState.currentImageIndex].desc}
-</p>
+                                <h3 class="text-xl font-bold text-gray-800 mt-2">
+                                    ${bankImages[appState.currentImageIndex].title}
+                                </h3>
+                                <p class="text-gray-600">
+                                    ${bankImages[appState.currentImageIndex].desc}
+                                </p>
                             </div>
                             
                             <!-- Indicateurs -->
                             <div class="flex justify-center gap-2">
-                                ${bankImages.map((_, index) =>
+                                ${bankImages.map((_, index) => `
                                     <div class="w-2 h-2 rounded-full ${
                                         index === appState.currentImageIndex ? 'bg-blue-600' : 'bg-gray-300'
                                     }"></div>
@@ -1217,9 +1216,9 @@ function getPageText(key) {
 
         // Initialize app
         function initApp() {
-    // Image carousel
-    setInterval(() => {
-        appState.currentImageIndex = (appState.currentImageIndex + 1) % bankImages.length;
+            // Image carousel
+            setInterval(() => {
+                appState.currentImageIndex = (appState.currentImageIndex + 1) % bankImages.length;
                 if (appState.currentScreen === 'home') {
                     const scrollingText = document.getElementById('scrollingText');
                     const imageCarousel = document.getElementById('imageCarousel');
