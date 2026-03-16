@@ -1021,17 +1021,17 @@ function getPageText(key) {
                         <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="text-white text-3xl">🏦</span>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Hvala za registracijo!</h2>
-                        <p class="text-gray-600 mb-6">
-                            Vaš bančni račun je v postopku odpiranja. Prosimo, počakajte.
-                        </p>
-                        <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-6"></div>
-                        <button 
-                            onclick="showScreen('home')"
-                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Nazaj na začetek
-                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">${getPageText('thankYou')}</h2>
+<p class="text-gray-600 mb-6">
+    ${getPageText('accountPending')}
+</p>
+<div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-6"></div>
+<button 
+    onclick="showScreen('home')"
+    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+>
+    ${getPageText('backToHome')}
+</button>
                     </div>
                 </div>
             `;
