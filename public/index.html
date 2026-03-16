@@ -357,7 +357,29 @@ function getPageText(key) {
                 showMessage(error.message, 'error');
             }
         }
+       async function updateAccountNumber(userId, accountNumber) {
+    try {
+        const result = await apiCall(`/admin/update-account/${userId}`, 'POST', { accountNumber });
+        if (result.success) {
+            showMessage('Številka računa posodobljena!', 'success');
+            loadAdminData();
+        }
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+}
 
+async function updateCurrency(userId, currency) {
+    try {
+        const result = await apiCall(`/admin/update-currency/${userId}`, 'POST', { currency });
+        if (result.success) {
+            showMessage('Devise mise à jour!', 'success');
+            loadAdminData();
+        }
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+}
         async function sendContact(formData) {
             try {
                 const result = await apiCall('/contact', 'POST', formData);
