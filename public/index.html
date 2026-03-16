@@ -1133,9 +1133,9 @@ function getPageText(key) {
             const data = Object.fromEntries(formData.entries());
             
             if (data.motDePasse !== data.confirmerMotDePasse) {
-                showMessage('Gesli se ne ujemata', 'error');
-                return;
-            }
+    showMessage(getPageText('passwordMismatch'), 'error');
+    return;
+}
             
             register(data);
         }
