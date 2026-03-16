@@ -120,7 +120,12 @@ function getPageText(key) {
         contactTitle: { sl: 'Kontaktirajte nas', hr: 'Kontaktirajte nas', es: 'Contáctenos' },
         name: { sl: 'Ime', hr: 'Ime', es: 'Nombre' },
         message: { sl: 'Sporočilo', hr: 'Poruka', es: 'Mensaje' },
-        sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku', es: 'Enviar mensaje' }
+        sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku', es: 'Enviar mensaje' },
+        
+        // Page d'attente
+        thankYou: { sl: 'Hvala za registracijo!', hr: 'Hvala na registraciji!', es: '¡Gracias por registrarse!' },
+        accountPending: { sl: 'Vaš bančni račun je v postopku odpiranja. Prosimo, počakajte.', hr: 'Vaš bankovni račun je u postupku otvaranja. Molimo pričekajte.', es: 'Su cuenta bancaria está en proceso de apertura. Por favor, espere.' },
+        backToHome: { sl: 'Nazaj na začetek', hr: 'Natrag na početak', es: 'Volver al inicio' }
     };
     
     return translations[key] ? (translations[key][currentLang] || translations[key]['sl']) : key;
