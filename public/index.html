@@ -133,28 +133,26 @@ function getPageText(key) {
             "Inovativne rešitve za moderne uporabnike"
         ];
 
-        const bankImages = [
-            {
-                icon: "📱",
-                title: "Mobilno bančništvo",
-                desc: "Dostop do vseh storitev"
-            },
-            {
-                icon: "💶",
-                title: "Transferji",
-                desc: "Hitri in varni prenosi"
-            },
-            {
-                icon: "💳",
-                title: "Plačilne kartice",
-                desc: "Brezstične plačila"
-            },
-            {
-                icon: "🏦",
-                title: "Varne storitve",
-                desc: "Zaščita vašega denarja"
-            }
-        ];
+       const bankImages = {
+    sl: [
+        { icon: "📱", title: "Mobilno bančništvo", desc: "Dostop do vseh storitev" },
+        { icon: "💶", title: "Transferji", desc: "Hitri in varni prenosi" },
+        { icon: "💳", title: "Plačilne kartice", desc: "Brezstične plačila" },
+        { icon: "🏦", title: "Varne storitve", desc: "Zaščita vašega denarja" }
+    ],
+    hr: [
+        { icon: "📱", title: "Mobilno bankarstvo", desc: "Pristup svim uslugama" },
+        { icon: "💶", title: "Transferi", desc: "Brzi i sigurni prijenosi" },
+        { icon: "💳", title: "Platne kartice", desc: "Beskontaktna plaćanja" },
+        { icon: "🏦", title: "Sigurne usluge", desc: "Zaštita vašeg novca" }
+    ],
+    es: [
+        { icon: "📱", title: "Banca móvil", desc: "Acceso a todos los servicios" },
+        { icon: "💶", title: "Transferencias", desc: "Transferencias rápidas y seguras" },
+        { icon: "💳", title: "Tarjetas de pago", desc: "Pagos sin contacto" },
+        { icon: "🏦", title: "Servicios seguros", desc: "Protección de su dinero" }
+    ]
+};
 
         // Fonctions utilitaires
         function showScreen(screenName) {
