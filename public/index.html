@@ -245,7 +245,17 @@ function getPageText(key) {
                         appState.userAccount = result.user;
                         showScreen('dashboard');
                     }
-                    
+                    async function refreshUserProfile() {
+    try {
+        const result = await apiCall('/user/profile');
+        if (result.success) {
+            appState.userAccount = result.user;
+            renderCurrentScreen();
+        }
+    } catch (error) {
+        console.error('Erreur lors du rafraîchissement:', error);
+    }
+}
                     showMessage('Prijava uspešna!', 'success');
                 }
             } catch (error) {
