@@ -1215,10 +1215,7 @@ function getPageText(key) {
         }
 
         // Initialize app
-        function initApp() {
-            // Image carousel
-            setInterval(() => {
-                appState.currentImageIndex = (appState.currentImageIndex + 1) % bankImages.length;
+        appState.currentImageIndex = (appState.currentImageIndex + 1) % bankImages[currentLang].length;
                 if (appState.currentScreen === 'home') {
                     const scrollingText = document.getElementById('scrollingText');
                     const imageCarousel = document.getElementById('imageCarousel');
