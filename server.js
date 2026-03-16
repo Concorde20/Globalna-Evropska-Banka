@@ -401,7 +401,35 @@ app.post('/api/admin/update-account/:userId', authenticateToken, async (req, res
     res.status(500).json({ success: false, message: 'Napaka strežnika' });
   }
 });
+app.post('/api/admin/update-account/:userId', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Accès refusé' });
+        }
 
+        const { accountNumber } = req.body;
+        await User.findByIdAndUpdate(req.params.userId, { accountNumber });
+
+        res.json({ success: true, message: 'Numéro de compte mis à jour' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.post('/api/admin/update-currency/:userId', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Accès refusé' });
+        }
+
+        const { currency } = req.body;
+        await User.findByIdAndUpdate(req.params.userId, { currency });
+
+        res.json({ success: true, message: 'Devise mise à jour' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 // Route pour obtenir les données utilisateur
 app.get('/api/user/profile', authenticateToken, async (req, res) => {
   try {
