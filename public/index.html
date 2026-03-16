@@ -53,8 +53,10 @@ function setLanguage(lang) {
     showScreen('home');
 }
 
-function getText(slovenian, croatian) {
-    return currentLang === 'hr' ? croatian : slovenian;
+function getText(slovenian, croatian, spanish) {
+    if (currentLang === 'hr') return croatian;
+    if (currentLang === 'es') return spanish || slovenian;
+    return slovenian;
 }
 
 function getScrollingText() {
