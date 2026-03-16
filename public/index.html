@@ -417,7 +417,7 @@ function getPageText(key) {
                             
                             <!-- Indicateurs -->
                             <div class="flex justify-center gap-2">
-                                ${bankImages[currentLang].map((_, index) =>
+                                ${bankImages.map((_, index) =>
                                     <div class="w-2 h-2 rounded-full ${
                                         index === appState.currentImageIndex ? 'bg-blue-600' : 'bg-gray-300'
                                     }"></div>
