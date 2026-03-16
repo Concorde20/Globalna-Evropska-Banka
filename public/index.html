@@ -125,7 +125,14 @@ function getPageText(key) {
         // Page d'attente
         thankYou: { sl: 'Hvala za registracijo!', hr: 'Hvala na registraciji!', es: '¡Gracias por registrarse!' },
         accountPending: { sl: 'Vaš bančni račun je v postopku odpiranja. Prosimo, počakajte.', hr: 'Vaš bankovni račun je u postupku otvaranja. Molimo pričekajte.', es: 'Su cuenta bancaria está en proceso de apertura. Por favor, espere.' },
-        backToHome: { sl: 'Nazaj na začetek', hr: 'Natrag na početak', es: 'Volver al inicio' }
+        backToHome: { sl: 'Nazaj na začetek', hr: 'Natrag na početak', es: 'Volver al inicio' },
+        // Cartes bancaires
+        accountHolder: { sl: 'Imetnik', hr: 'Vlasnik', es: 'Titular' },
+        currentAccount: { sl: 'CTA TEKOČI...', hr: 'CTA TEKUĆI...', es: 'CTA CORRIENTE...' },
+        debitCard: { sl: 'DEBETNA KARTICA', hr: 'DEBITNA KARTICA', es: 'TARJETA DE DÉBITO' },
+        openDebit: { sl: 'OPEN DEBIT MASTERCARD', hr: 'OPEN DEBIT MASTERCARD', es: 'OPEN DEBIT MASTERCARD' },
+        linkedAccount: { sl: 'Povezani račun', hr: 'Povezani račun', es: 'Cuenta vinculada' }
+    };
     };
     
     return translations[key] ? (translations[key][currentLang] || translations[key]['sl']) : key;
