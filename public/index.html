@@ -67,9 +67,16 @@ function getScrollingText() {
         'Inovativna rješenja za moderne korisnike'
     ];
     
-    return currentLang === 'hr' ? 
-        croatianTexts[appState.currentImageIndex] : 
-        scrollingTexts[appState.currentImageIndex];
+    const spanishTexts = [
+        'Banco que revoluciona los servicios bancarios digitales',
+        '100 % digital, 100 % seguro',
+        'Tu futuro bancario está aquí',
+        'Soluciones innovadoras para usuarios modernos'
+    ];
+    
+    if (currentLang === 'hr') return croatianTexts[appState.currentImageIndex];
+    if (currentLang === 'es') return spanishTexts[appState.currentImageIndex];
+    return scrollingTexts[appState.currentImageIndex];
 }
         // Nouvelle fonction pour les autres pages
 function getPageText(key) {
