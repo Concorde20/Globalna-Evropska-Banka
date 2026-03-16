@@ -112,7 +112,7 @@ message: { sl: 'Sporočilo', hr: 'Poruka' },
 sendMessage: { sl: 'Pošljite sporočilo', hr: 'Pošaljite poruku' }
     };
     
-    return translations[key] ? translations[key][currentLang] : key;
+    return translations[key] ? (translations[key][currentLang] || translations[key]['sl']) : key;
 }
         // Données statiques
         const scrollingTexts = [
