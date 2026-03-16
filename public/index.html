@@ -880,18 +880,19 @@ function getPageText(key) {
                             <div class="overflow-x-auto">
                                 <table class="w-full border-collapse border border-gray-300">
                                     <thead>
-                                        <tr class="bg-gray-50">
-                                            <th class="border border-gray-300 p-3 text-left">ID</th>
-                                            <th class="border border-gray-300 p-3 text-left">Ime</th>
-                                            <th class="border border-gray-300 p-3 text-left">Priimek</th>
-                                            <th class="border border-gray-300 p-3 text-left">E-pošta</th>
-                                            <th class="border border-gray-300 p-3 text-left">Telefon</th>
-                                            <th class="border border-gray-300 p-3 text-left">Številka računa</th>
-                                            <th class="border border-gray-300 p-3 text-left">Stanje</th>
-                                            <th class="border border-gray-300 p-3 text-left">Status</th>
-                                            <th class="border border-gray-300 p-3 text-left">Dejanja</th>
-                                        </tr>
-                                    </thead>
+    <tr class="bg-gray-50">
+        <th class="border border-gray-300 p-3 text-left">ID</th>
+        <th class="border border-gray-300 p-3 text-left">Ime</th>
+        <th class="border border-gray-300 p-3 text-left">Priimek</th>
+        <th class="border border-gray-300 p-3 text-left">E-pošta</th>
+        <th class="border border-gray-300 p-3 text-left">Telefon</th>
+        <th class="border border-gray-300 p-3 text-left">Številka računa</th>
+        <th class="border border-gray-300 p-3 text-left">Stanje</th>
+        <th class="border border-gray-300 p-3 text-left">Devise</th>
+        <th class="border border-gray-300 p-3 text-left">Status</th>
+        <th class="border border-gray-300 p-3 text-left">Dejanja</th>
+    </tr>
+</thead>
                                     <tbody>
                                         ${appState.pendingAccounts.map((account) => `
                                             <tr class="hover:bg-gray-50">
