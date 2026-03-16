@@ -249,8 +249,17 @@ function getPageText(key) {
                     showMessage('Prijava uspešna!', 'success');
                 }
             } catch (error) {
-                showMessage(error.message, 'error');
-            }
+    // Traduire les messages d'erreur
+    let errorMsg = error.message;
+    if (errorMsg.includes('Napačni') || errorMsg.includes('Invalid')) {
+        errorMsg = getPageText('wrongCredentials');
+    } else if (errorMsg.includes('čaka') || errorMsg.includes('pending')) {
+        errorMsg = getPageText('accountPendingMsg');
+    } else if (errorMsg.includes('blokiran') || errorMsg.includes('blocked')) {
+        errorMsg = getPageText('accountBlocked');
+    }
+    showMessage(errorMsg, 'error');
+}
         }
 
         async function register(formData) {
