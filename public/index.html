@@ -720,15 +720,15 @@ async function updateCurrency(userId, currency) {
                                 </div>
 
                                 <div>
-                                    <label class="block text-gray-700 mb-2">E-pošta</label>
-                                    <input 
-                                        type="email"
-                                        name="email"
-                                        required
-                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-                                        placeholder="ime@email.com"
-                                    />
-                                </div>
+    <label class="block text-gray-700 mb-2">${getPageText('email')}</label>
+    <input 
+        type="email"
+        name="email"
+        required
+        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+        placeholder="${getPageText('email')}"
+    />
+</div>
 
 <div>
     <label class="block text-gray-700 mb-2">${getPageText('password')}</label>
