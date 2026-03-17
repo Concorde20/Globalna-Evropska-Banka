@@ -729,18 +729,17 @@ async function updateCurrency(userId, currency) {
                                     />
                                 </div>
 
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Geslo</label>
-                                    <input 
-                                        type="password"
-                                        name="motDePasse"
-                                        required
-                                        minlength="6"
-                                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-                                        placeholder="Ustvarite geslo (min. 6 znakov)"
-                                    />
-                                </div>
-
+<div>
+    <label class="block text-gray-700 mb-2">${getPageText('password')}</label>
+    <input 
+        type="password"
+        name="motDePasse"
+        required
+        minlength="6"
+        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+        placeholder="${getPageText('password')} (min. 6)"
+    />
+</div>
                                 <div>
                             <label class="block text-gray-700 mb-2">${getPageText('confirmPassword')}</label>
                                     <input 
