@@ -221,6 +221,7 @@ if (username === 'admin' && password === 'Primaire20252025') {
         priimek: user.priimek,
         accountNumber: user.accountNumber,
         balance: user.balance,
+        currency: user.currency,
         isAdmin: false
       }
     });
