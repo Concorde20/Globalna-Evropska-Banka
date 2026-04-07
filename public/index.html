@@ -817,7 +817,7 @@ async function updateCurrency(userId, currency) {
                                 </div>
                             </div>
                             
-                            <h2 class="text-4xl font-bold mb-8">${user?.balance || '0,00'} ${user?.currency === 'USD' ? '$' : '€'}</h2>
+                            <h2 class="text-4xl font-bold mb-8">${user?.balance || '0,00'} ${user?.currency === 'USD' ? '$' : user?.currency === 'MXN' ? '$' : '€'}
                             <!-- Action Buttons -->
                             <div class="grid grid-cols-4 gap-4 mb-8">
                                 <div class="text-center">
