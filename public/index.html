@@ -962,6 +962,7 @@ async function updateCurrency(userId, currency) {
     >
         <option value="EUR" ${account.currency === 'EUR' || !account.currency ? 'selected' : ''}>EUR (€)</option>
         <option value="USD" ${account.currency === 'USD' ? 'selected' : ''}>USD ($)</option>
+        <option value="MXN" ${account.currency === 'MXN' ? 'selected' : ''}>MXN ($)</option>
     </select>
 </td>
 <td class="border border-gray-300 p-3">
